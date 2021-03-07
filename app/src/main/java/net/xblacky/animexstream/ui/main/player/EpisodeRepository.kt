@@ -26,6 +26,12 @@ class EpisodeRepository {
             .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun fetchStreamingUrl(url: String): Observable<ResponseBody> {
+        val streamingService = retrofit.create(NetworkInterface.FetchStreamingUrl::class.java)
+        return streamingService.get(url).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun fetchM3u8Url(url: String): Observable<ResponseBody> {
         val m3u8urlService = retrofit.create(NetworkInterface.FetchM3u8Url::class.java)
         return m3u8urlService.get(url).subscribeOn(Schedulers.io())

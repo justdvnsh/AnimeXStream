@@ -1,5 +1,6 @@
 package net.xblacky.animexstream.ui.main.player
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.exoplayer2.upstream.HttpDataSource
@@ -23,7 +24,7 @@ class VideoPlayerViewModel : CommonViewModel() {
         episodeRepository.clearContent()
     }
 
-    fun fetchEpisodeMediaUrl(fetchFromDb: Boolean = true) {
+    fun fetchEpisodeMediaUrl(fetchFromDb: Boolean = false) {
         liveContent.value?.episodeUrl?.let {
             updateErrorModel(show = false, e = null, isListEmpty = false)
             updateLoading(loading = true)
@@ -65,12 +66,20 @@ class VideoPlayerViewModel : CommonViewModel() {
 
             override fun onNext(response: ResponseBody) {
                 if (type == C.TYPE_MEDIA_URL) {
+//                    Log.d("MYSELF FROM VIEW MODEL", response.string())
                     val episodeInfo = HtmlParser.parseMediaUrl(response = response.string())
+//                    episodeInfo.vidcdnUrl?.let {
+//                        compositeDisposable.add(
+//                            episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!).subscribeWith(
+//                                getEpisodeUrlObserver(C.TYPE_M3U8_URL)
+//                            )
+//                        )
+//                    }
                     episodeInfo.vidcdnUrl?.let {
                         compositeDisposable.add(
-                            episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!).subscribeWith(
-                                getEpisodeUrlObserver(C.TYPE_M3U8_URL)
-                            )
+                                episodeRepository.fetchStreamingUrl(episodeInfo.vidcdnUrl!!).subscribeWith(
+                                        getEpisodeUrlObserver(C.TYPE_STREAMING_URL)
+                                )
                         )
                     }
                     val watchedEpisode =
@@ -82,6 +91,13 @@ class VideoPlayerViewModel : CommonViewModel() {
                     val m3u8Url = HtmlParser.parseM3U8Url(response = response.string())
                     val content = _content.value
                     content?.url = m3u8Url
+                    _content.value = content
+                    saveContent(content!!)
+                    updateLoading(false)
+                } else if (type == C.TYPE_STREAMING_URL) {
+                    val url = HtmlParser.parseStreamingUrl(response.string())
+                    val content = _content.value
+                    content?.url = url
                     _content.value = content
                     saveContent(content!!)
                     updateLoading(false)

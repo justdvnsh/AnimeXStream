@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -81,6 +82,7 @@ class VideoPlayerActivity : AppCompatActivity(), VideoPlayerListener {
                 url = ""
             )
         )
+        Log.d("MYSELF FROM VIDEOPLAYER", url)
         viewModel.fetchEpisodeMediaUrl()
     }
 

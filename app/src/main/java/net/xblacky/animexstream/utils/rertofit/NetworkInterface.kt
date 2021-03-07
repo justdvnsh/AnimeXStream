@@ -73,6 +73,18 @@ class NetworkInterface {
 
     }
 
+    interface FetchStreamingUrl {
+        @Headers(
+                C.USER_AGENT,
+                C.REFERER
+        )
+        @GET
+        fun get(
+                @Url url: String
+        ): Observable<ResponseBody>
+
+    }
+
     interface FetchAnimeInfo {
         @Headers(
             C.USER_AGENT,

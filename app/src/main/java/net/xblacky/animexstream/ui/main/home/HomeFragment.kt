@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
@@ -107,6 +108,7 @@ class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapt
     }
 
     override fun recentSubDubEpisodeClick(model: AnimeMetaModel) {
+        Log.d("MYSELF", model.episodeUrl)
         findNavController().navigate(
             HomeFragmentDirections.actionHomeFragmentToVideoPlayerActivity(
                 episodeUrl = model.episodeUrl,
@@ -128,7 +130,7 @@ class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapt
     }
 
     private fun showDialog(whatsNew: String) {
-        AlertDialog.Builder(context!!).setTitle("New Update Available")
+        AlertDialog.Builder(requireContext()).setTitle("New Update Available")
             .setMessage("What's New ! \n$whatsNew")
             .setCancelable(false)
             .setPositiveButton("Update") { _, _ ->

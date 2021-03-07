@@ -11,7 +11,7 @@ class C {
         const val NO_INTERNET_CONNECTION = 1001
 
         //Base URLS
-        var BASE_URL = "https://www.gogoanime.movie"
+        var BASE_URL = "https://www.gogoanime.sh"
         const val EPISODE_LOAD_URL = "https://ajax.gogocdn.net/ajax/load-list-episode"
         const val SEARCH_URL = "/search.html"
 
@@ -41,6 +41,7 @@ class C {
         //Episode URL Type
         const val TYPE_MEDIA_URL = 100
         const val TYPE_M3U8_URL = 101
+        const val TYPE_STREAMING_URL = 102
 
         //Anime Info URL Type
         const val TYPE_ANIME_INFO = 1000
