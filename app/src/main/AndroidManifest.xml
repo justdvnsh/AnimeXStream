@@ -4,8 +4,7 @@
     package="net.xblacky.animexstream">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".AnimeXStream"
@@ -39,7 +38,7 @@
                 "screenSize|smallestScreenSize|screenLayout|orientation"
             tools:ignore="LockedOrientationActivity"
             tools:targetApi="n" />
-
+    <service android:name=".utils.service.ForegroundNotificationService" android:exported="false" android:enabled="true"/>
     </application>
 
 </manifest>

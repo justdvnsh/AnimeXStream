@@ -1,6 +1,7 @@
 package net.xblacky.animexstream.ui.main.player
 
 import android.content.Context
+import android.content.Intent
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.Uri
@@ -42,6 +43,7 @@ import net.xblacky.animexstream.utils.constants.C.Companion.ERROR_CODE_DEFAULT
 import net.xblacky.animexstream.utils.constants.C.Companion.NO_INTERNET_CONNECTION
 import net.xblacky.animexstream.utils.constants.C.Companion.RESPONSE_UNKNOWN
 import net.xblacky.animexstream.utils.model.Content
+import net.xblacky.animexstream.utils.service.ForegroundNotificationService
 import timber.log.Timber
 import java.io.IOException
 import java.net.URLDecoder
@@ -88,6 +90,7 @@ class VideoPlayerFragment : Fragment(), View.OnClickListener, Player.EventListen
         setClickListeners()
         initializeAudioManager()
         initializePlayer()
+        startForegroundNotification()
         retainInstance = true
         return rootView
     }
@@ -102,7 +105,16 @@ class VideoPlayerFragment : Fragment(), View.OnClickListener, Player.EventListen
         if (::handler.isInitialized) {
             handler.removeCallbacksAndMessages(null)
         }
+        val intent = Intent(requireContext(), ForegroundNotificationService::class.java)
+        intent.setAction(ForegroundNotificationService.ACTION_START_FOREGROUND_SERVICE)
+        requireActivity().stopService(intent)
         super.onDestroy()
+    }
+
+    private fun startForegroundNotification() {
+        val intent = Intent(requireContext(), ForegroundNotificationService::class.java)
+        intent.setAction(ForegroundNotificationService.ACTION_START_FOREGROUND_SERVICE)
+        requireActivity().startService(intent)
     }
 
     private fun initializePlayer() {
@@ -365,7 +377,7 @@ class VideoPlayerFragment : Fragment(), View.OnClickListener, Player.EventListen
 
     // show dialog to select the speed.
     private fun showDialogForSpeedSelection() {
-        val builder = AlertDialog.Builder(context!!)
+        val builder = AlertDialog.Builder(requireContext())
         builder.apply {
             setTitle("Set your playback speed")
             setSingleChoiceItems(showableSpeed, checkedItem) {_, which ->
