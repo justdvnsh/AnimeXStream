@@ -3,6 +3,7 @@ package net.xblacky.animexstream.utils
 import android.content.Context
 import android.util.DisplayMetrics
 import net.xblacky.animexstream.utils.constants.C
+import java.io.File
 
 
 class Utils {
@@ -40,6 +41,10 @@ class Utils {
                 C.TYPE_POPULAR_ANIME -> C.POPULAR_POSITION
                 else -> 0
             }
+        }
+
+        fun createVideoFile(filename: String, context: Context): File {
+            throw UnsupportedOperationException("Not supported yet")
         }
 
     }

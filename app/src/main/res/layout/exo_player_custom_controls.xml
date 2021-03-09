@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/back"
-        android:padding="10dp"
+        android:padding="8dp"
         android:background="?selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
@@ -162,6 +162,22 @@
         android:src="@drawable/exo_controls_fullscreen_enter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/exo_download_video_view"
+        app:layout_constraintEnd_toStartOf="@id/exo_speed_selection_view"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/media_player_controls"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/ic_baseline_arrow_downward_24"
+        android:background="?selectableItemBackgroundBorderless"
+        android:textStyle="bold"
+        android:paddingTop="20dp"
+        android:paddingStart="20dp"
+        android:paddingBottom="20dp"
+        android:paddingEnd="10dp"/>
 
     <TextView
         android:layout_width="wrap_content"

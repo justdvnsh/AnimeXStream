@@ -1,7 +1,9 @@
 package net.xblacky.animexstream.ui.main.player
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.Uri
@@ -9,11 +11,15 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -43,6 +49,7 @@ import net.xblacky.animexstream.utils.constants.C.Companion.ERROR_CODE_DEFAULT
 import net.xblacky.animexstream.utils.constants.C.Companion.NO_INTERNET_CONNECTION
 import net.xblacky.animexstream.utils.constants.C.Companion.RESPONSE_UNKNOWN
 import net.xblacky.animexstream.utils.model.Content
+import net.xblacky.animexstream.utils.service.DownloadingService
 import net.xblacky.animexstream.utils.service.ForegroundNotificationService
 import timber.log.Timber
 import java.io.IOException
@@ -139,6 +146,7 @@ class VideoPlayerFragment : Fragment(), View.OnClickListener, Player.EventListen
 
     private fun setClickListeners() {
         rootView.exo_full_Screen.setOnClickListener(this)
+        rootView.exo_download_video_view.setOnClickListener(this)
         rootView.exo_track_selection_view.setOnClickListener(this)
         rootView.exo_speed_selection_view.setOnClickListener(this)
         rootView.errorButton.setOnClickListener(this)
@@ -216,6 +224,19 @@ class VideoPlayerFragment : Fragment(), View.OnClickListener, Player.EventListen
             R.id.exo_track_selection_view -> {
                 showDialog()
             }
+            R.id.exo_download_video_view -> {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                    if (hasPermission()) {
+                        Toast.makeText(requireContext(), "Downloading Video", Toast.LENGTH_SHORT).show()
+                        DownloadingService.downloadAnime(
+                                requireActivity(),
+                                videoUrl
+                        )
+                    } else requestPermission()
+                } else {
+                    Log.d("MYSELF", "SOMETHING HAPPENED")
+                }
+            }
             R.id.exo_speed_selection_view -> {
                 showDialogForSpeedSelection()
             }
@@ -267,6 +288,26 @@ class VideoPlayerFragment : Fragment(), View.OnClickListener, Player.EventListen
                 )
             }
         }
+    }
+
+    private fun hasPermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                and
+                ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+        return false
+    }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+                requireActivity(),
+                listOf<String>(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).toTypedArray(),
+                110
+        )
     }
 
     private fun refreshData() {
