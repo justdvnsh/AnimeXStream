@@ -160,7 +160,6 @@ class HtmlParser {
 
         fun parseMediaUrl(response: String): EpisodeInfo{
             var mediaUrl: String? = null
-            var downloadUrl: String? = null
             val document = Jsoup.parse(response)
             Log.d("MYSELF FROM PARSER", document.toString())
             val info = document?.getElementsByClass("favorites_book")?.first()?.child(0)?.children()
@@ -173,9 +172,6 @@ class HtmlParser {
                         Log.d("MYSELF -> CLS ", cls.toString())
                         cls?.let {
                             mediaUrl = it.attr("href").toString()
-//                            Log.d("MYSELF -> DWONLOAD ", downloadUrl)
-//                            val resp = EpisodeRepository().fetchStreamingUrl(downloadUrl!!)
-//                            Log.d("MYSELF RESP _> ", resp.string())
                         } ?: kotlin.run {
                             // do somethinf
                         }
@@ -194,11 +190,11 @@ class HtmlParser {
         }
 
         fun parseStreamingUrl(url: String): String {
-            Log.d("MYSELF -> RECV ", Jsoup.parse(url).toString())
+            Timber.d(Jsoup.parse(url).toString())
             val doc = Jsoup.parse(url)
             val streamingLinks = doc.getElementsByClass("dowload")?.first()?.select("a")
             val link = streamingLinks?.attr("href").toString()
-            Log.d("MYSELF -> LINK ", link)
+            Timber.d(link)
             return link
         }
 

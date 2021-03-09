@@ -39,6 +39,9 @@ android {
         archivesBaseName = "AnimexStream-v$versionName"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    dataBinding {
+        enabled = true
+    }
     buildTypes {
         release {
 //            signingConfig signingConfigs.release
@@ -133,4 +136,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
     implementation 'com.google.firebase:firebase-messaging:20.2.4'
     implementation 'com.google.firebase:firebase-database-ktx:19.3.1'
+
+    // Testing - Local Unit Tests
+    testImplementation "com.google.truth:truth:1.0.1"
+
+    // Testing - Instrumented Unit Tests
+    androidTestImplementation "com.google.truth:truth:1.0.1"
 }
