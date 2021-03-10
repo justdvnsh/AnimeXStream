@@ -11,15 +11,20 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_video_player.*
 import kotlinx.android.synthetic.main.fragment_video_player.*
 import net.xblacky.animexstream.MainActivity
 import net.xblacky.animexstream.R
+import net.xblacky.animexstream.ui.main.player.videoQueue.VideoQueueBottomSheet
 import net.xblacky.animexstream.utils.model.Content
+import org.jsoup.helper.StringUtil
 import timber.log.Timber
 import java.lang.Exception
 
@@ -82,8 +87,21 @@ class VideoPlayerActivity : AppCompatActivity(), VideoPlayerListener {
                 url = ""
             )
         )
-        Log.d("MYSELF FROM VIDEOPLAYER", url)
+        Log.d("MYSELF FROM VIDEOPLAYER", url!!)
+        if (!(playerFragment as VideoPlayerFragment).isVideoPlaying()) {
+            setupBottomSheet(url, animeName!!)
+        }
         viewModel.fetchEpisodeMediaUrl()
+    }
+
+    private fun setupBottomSheet(url: String, animeName: String) {
+        val bottomSheet = VideoQueueBottomSheet.newInstance(
+            Bundle().apply {
+                putString("URL", url)
+                putString("NAME", animeName)
+            }
+        )
+        bottomSheet.show(supportFragmentManager, VideoQueueBottomSheet.TAG)
     }
 
     @Suppress("DEPRECATION")

@@ -1,6 +1,7 @@
 package net.xblacky.animexstream.ui.main.animeinfo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,8 @@ class AnimeInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         rootView = inflater.inflate(R.layout.fragment_animeinfo, container, false)
-        viewModelFactory = AnimeInfoViewModelFactory(AnimeInfoFragmentArgs.fromBundle(arguments!!).categoryUrl!!)
+        Log.d("MYSELF -> ANIMEURL", AnimeInfoFragmentArgs.fromBundle(requireArguments()).categoryUrl!!)
+        viewModelFactory = AnimeInfoViewModelFactory(AnimeInfoFragmentArgs.fromBundle(requireArguments()).categoryUrl!!)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AnimeInfoViewModel::class.java)
         setupRecyclerView()
         setObserver()

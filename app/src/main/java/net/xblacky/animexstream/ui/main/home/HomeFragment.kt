@@ -120,6 +120,7 @@ class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapt
 
     override fun animeTitleClick(model: AnimeMetaModel) {
         if(!model.categoryUrl.isNullOrBlank()){
+            Log.d("MYSELF -> ANIME", model.categoryUrl)
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToAnimeInfoFragment(
                     categoryUrl = model.categoryUrl
