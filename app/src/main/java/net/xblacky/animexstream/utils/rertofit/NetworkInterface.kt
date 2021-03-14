@@ -1,6 +1,5 @@
 package net.xblacky.animexstream.utils.rertofit
 
-import io.reactivex.Observable
 import net.xblacky.animexstream.utils.constants.C
 import okhttp3.ResponseBody
 import retrofit2.http.GET
@@ -19,10 +18,10 @@ class NetworkInterface {
             C.REFERER
         )
         @GET("https://ajax.gogocdn.net/ajax/page-recent-release.html")
-        fun get(
+        suspend fun get(
             @Query("page") page: Int,
             @Query("type") type: Int
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchPopularFromAjax {
@@ -33,9 +32,9 @@ class NetworkInterface {
             C.REFERER
         )
         @GET("https://ajax.gogocdn.net/ajax/page-recent-release-ongoing.html")
-        fun get(
+        suspend fun get(
             @Query("page") page: Int
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchMovies {
@@ -44,9 +43,9 @@ class NetworkInterface {
             C.REFERER
         )
         @GET("/anime-movies.html")
-        fun get(
+        suspend fun get(
             @Query("page") page: Int
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchNewestSeason {
@@ -56,9 +55,9 @@ class NetworkInterface {
         )
 
         @GET("/new-season.html")
-        fun get(
+        suspend fun get(
             @Query("page") page: Int
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchEpisodeMediaUrl {
@@ -67,9 +66,9 @@ class NetworkInterface {
             C.REFERER
         )
         @GET
-        fun get(
+        suspend fun get(
             @Url url: String
-        ): Observable<ResponseBody>
+        ): ResponseBody
 
     }
 
@@ -79,9 +78,9 @@ class NetworkInterface {
             C.REFERER
         )
         @GET
-        fun get(
+        suspend fun get(
             @Url url: String
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchM3u8Url {
@@ -90,9 +89,9 @@ class NetworkInterface {
             C.REFERER
         )
         @GET
-        fun get(
+        suspend fun get(
             @Url url: String
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchEpisodeList{
@@ -102,13 +101,13 @@ class NetworkInterface {
             C.REFERER
         )
         @GET(C.EPISODE_LOAD_URL)
-        fun get(
+        suspend fun get(
             @Query("ep_start") startEpisode: Int = 0,
             @Query("ep_end") endEpisode: String,
             @Query("id") id: String,
             @Query("default_ep") defaultEp: Int = 0,
             @Query("alias") alias: String
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
     interface FetchSearchData{
@@ -117,10 +116,10 @@ class NetworkInterface {
             C.REFERER
         )
         @GET(C.SEARCH_URL)
-        fun get(
+        suspend fun get(
             @Query("keyword") keyword: String,
             @Query("page") page: Int
-        ): Observable<ResponseBody>
+        ): ResponseBody
     }
 
 }

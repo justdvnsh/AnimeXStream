@@ -12,12 +12,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.android.synthetic.main.main_activity.*
@@ -29,13 +31,14 @@ import net.xblacky.animexstream.utils.constants.C
 import net.xblacky.animexstream.utils.model.AnimeMetaModel
 import timber.log.Timber
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapterCallbacks {
 
 
     private lateinit var rootView: View
     private lateinit var homeController: HomeController
     private var doubleClickLastTime = 0L
-    private lateinit var viewModel: HomeViewModel
+    val viewModel: HomeViewModel by viewModels()
     var bottomNavigationView: BottomNavigationView? = null
 
     override fun onCreateView(
@@ -51,7 +54,6 @@ class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapt
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         bottomNavigationView = (activity as MainActivity).bottomBar
         viewModelObserver()
     }
