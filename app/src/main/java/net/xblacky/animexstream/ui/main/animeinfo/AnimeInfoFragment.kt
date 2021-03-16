@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_animeinfo.*
 import kotlinx.android.synthetic.main.fragment_animeinfo.view.*
 import kotlinx.android.synthetic.main.fragment_animeinfo.view.animeInfoRoot
@@ -24,6 +25,7 @@ import net.xblacky.animexstream.utils.Tags.GenreTags
 import net.xblacky.animexstream.utils.Utils
 import net.xblacky.animexstream.utils.model.AnimeInfoModel
 
+@AndroidEntryPoint
 class AnimeInfoFragment : Fragment() {
 
     private lateinit var rootView: View
@@ -38,7 +40,7 @@ class AnimeInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         rootView = inflater.inflate(R.layout.fragment_animeinfo, container, false)
-        viewModelFactory = AnimeInfoViewModelFactory(AnimeInfoFragmentArgs.fromBundle(arguments!!).categoryUrl!!)
+        viewModelFactory = AnimeInfoViewModelFactory(AnimeInfoFragmentArgs.fromBundle(requireArguments()).categoryUrl!!)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AnimeInfoViewModel::class.java)
         setupRecyclerView()
         setObserver()
@@ -93,7 +95,7 @@ class AnimeInfoFragment : Fragment() {
         toolbarText.text = animeInfoModel.animeTitle
         flowLayout.removeAllViews()
         animeInfoModel.genre.forEach {
-            flowLayout.addView(GenreTags(context!!).getGenreTag(genreName = it.genreName, genreUrl = it.genreUrl))
+            flowLayout.addView(GenreTags(requireContext()).getGenreTag(genreName = it.genreName, genreUrl = it.genreUrl))
         }
        episodeController.setAnime(animeInfoModel.animeTitle)
         animeInfoSummary.text = animeInfoModel.plotSummary
@@ -103,12 +105,12 @@ class AnimeInfoFragment : Fragment() {
 
     private fun setupRecyclerView(){
         episodeController = AnimeInfoController()
-        episodeController.spanCount = Utils.calculateNoOfColumns(context!!, 150f)
+        episodeController.spanCount = Utils.calculateNoOfColumns(requireContext(), 150f)
         rootView.animeInfoRecyclerView.adapter = episodeController.adapter
         val itemOffsetDecoration = ItemOffsetDecoration(context, R.dimen.episode_offset_left)
         rootView.animeInfoRecyclerView.addItemDecoration(itemOffsetDecoration)
         rootView.animeInfoRecyclerView.apply {
-            layoutManager = GridLayoutManager(context,Utils.calculateNoOfColumns(context!!, 150f))
+            layoutManager = GridLayoutManager(context,Utils.calculateNoOfColumns(requireContext(), 150f))
             (layoutManager as GridLayoutManager).spanSizeLookup = episodeController.spanSizeLookup
 
         }

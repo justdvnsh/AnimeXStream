@@ -1,5 +1,6 @@
 package net.xblacky.animexstream.ui.main.home
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
@@ -23,7 +24,7 @@ import java.lang.IndexOutOfBoundsException
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class HomeViewModel @Inject constructor(
+class HomeViewModel @ViewModelInject constructor(
     private val homeRepository: HomeRepository,
     private val realm: Realm
 ) : ViewModel(){

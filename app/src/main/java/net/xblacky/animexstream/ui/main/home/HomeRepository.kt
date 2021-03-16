@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 class HomeRepository @Inject constructor(
     private val realm: Realm,
+    private val retrofit: Retrofit,
     private val fetchRecentSubOrDub: NetworkInterface.FetchRecentSubOrDub,
     private val fetchPopular: NetworkInterface.FetchPopularFromAjax,
     private val fetchMovies: NetworkInterface.FetchMovies,
@@ -27,7 +28,7 @@ class HomeRepository @Inject constructor(
 ) {
 
     suspend fun fetchRecentSubOrDub(page: Int, type: Int): ResponseBody =
-        fetchRecentSubOrDub.get(page, type)
+        retrofit.create(NetworkInterface.FetchRecentSubOrDub::class.java).get(page, type)
 
     suspend fun fetchPopularFromAjax(page: Int): ResponseBody = fetchPopular.get(page)
 

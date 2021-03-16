@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import net.xblacky.animexstream.ui.main.home.HomeRepository
+import net.xblacky.animexstream.utils.constants.C.Companion.BASE_URL
 import net.xblacky.animexstream.utils.realm.InitalizeRealm
 import net.xblacky.animexstream.utils.rertofit.NetworkInterface
 import net.xblacky.animexstream.utils.rertofit.RetrofitHelper
@@ -20,10 +21,9 @@ import javax.inject.Singleton
 @InstallIn(ApplicationComponent::class)
 object AppModule {
 
-    @Provides
     @Singleton
-    fun provideRetrofitInstance(): Retrofit? = RetrofitHelper.getRetrofitInstance()
-
+    @Provides
+    fun provideRetrofit(): Retrofit = Retrofit.Builder().baseUrl(BASE_URL).build()
 
     @Provides
     @Singleton
@@ -78,21 +78,21 @@ object AppModule {
     fun providesFetchSearchData(retrofit: Retrofit) =
         retrofit.create(NetworkInterface.FetchSearchData::class.java)
 
-    // repos
-    @Provides
-    @Singleton
-    fun provideHomeRepository(
-        realm: Realm,
-        fetchRecentSubOrDub: NetworkInterface.FetchRecentSubOrDub,
-        fetchPopular: NetworkInterface.FetchPopularFromAjax,
-        fetchMovies: NetworkInterface.FetchMovies,
-        fetchNewestSeason: NetworkInterface.FetchNewestSeason
-    ) =
-        HomeRepository(
-            realm,
-            fetchRecentSubOrDub,
-            fetchPopular,
-            fetchMovies,
-            fetchNewestSeason
-        )
+//    // repos
+//    @Provides
+//    @Singleton
+//    fun provideHomeRepository(
+//        realm: Realm,
+//        fetchRecentSubOrDub: NetworkInterface.FetchRecentSubOrDub,
+//        fetchPopular: NetworkInterface.FetchPopularFromAjax,
+//        fetchMovies: NetworkInterface.FetchMovies,
+//        fetchNewestSeason: NetworkInterface.FetchNewestSeason
+//    ) =
+//        HomeRepository(
+//            realm,
+//            fetchRecentSubOrDub,
+//            fetchPopular,
+//            fetchMovies,
+//            fetchNewestSeason
+//        )
 }

@@ -38,7 +38,7 @@ class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapt
     private lateinit var rootView: View
     private lateinit var homeController: HomeController
     private var doubleClickLastTime = 0L
-    val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     var bottomNavigationView: BottomNavigationView? = null
 
     override fun onCreateView(
@@ -130,7 +130,7 @@ class HomeFragment : Fragment(), View.OnClickListener, HomeController.EpoxyAdapt
     }
 
     private fun showDialog(whatsNew: String) {
-        AlertDialog.Builder(context!!).setTitle("New Update Available")
+        AlertDialog.Builder(requireContext()).setTitle("New Update Available")
             .setMessage("What's New ! \n$whatsNew")
             .setCancelable(false)
             .setPositiveButton("Update") { _, _ ->

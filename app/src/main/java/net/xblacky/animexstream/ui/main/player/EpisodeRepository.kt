@@ -4,6 +4,9 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.xblacky.animexstream.utils.constants.C
 import net.xblacky.animexstream.utils.rertofit.NetworkInterface
 import net.xblacky.animexstream.utils.rertofit.RetrofitHelper
@@ -13,24 +16,19 @@ import net.xblacky.animexstream.utils.realm.InitalizeRealm
 import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import timber.log.Timber
+import javax.inject.Inject
 
 
-class EpisodeRepository {
-    private var retrofit: Retrofit = RetrofitHelper.getRetrofitInstance()!!
-    private var realm = Realm.getInstance(InitalizeRealm.getConfig())
+class EpisodeRepository @Inject constructor(
+    val realm: Realm,
+    val fetchEpisodeMediaUrl: NetworkInterface.FetchEpisodeMediaUrl,
+    val fetchEpisodemM3u8Url: NetworkInterface.FetchM3u8Url
+){
 
 
-    fun fetchEpisodeMediaUrl(url: String): Observable<ResponseBody> {
-        val mediaUrlService = retrofit.create(NetworkInterface.FetchEpisodeMediaUrl::class.java)
-        return mediaUrlService.get(url).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-    }
+    suspend fun fetchEpisodeMediaUrl(url: String): ResponseBody = fetchEpisodeMediaUrl.get(url)
 
-    fun fetchM3u8Url(url: String): Observable<ResponseBody> {
-        val m3u8urlService = retrofit.create(NetworkInterface.FetchM3u8Url::class.java)
-        return m3u8urlService.get(url).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-    }
+    suspend fun fetchM3u8Url(url: String): ResponseBody = fetchEpisodemM3u8Url.get(url)
 
 
     fun fetchWatchedDuration(id: Int): WatchedEpisode?{
@@ -57,7 +55,7 @@ class EpisodeRepository {
     }
 
 
-    fun saveContent(content: Content){
+    fun saveContent(content: Content) = CoroutineScope(Dispatchers.IO).launch{
         try {
             content.insertionTime = System.currentTimeMillis()
             realm.executeTransactionAsync { realm1: Realm ->
@@ -80,7 +78,7 @@ class EpisodeRepository {
     }
 
 
-    fun clearContent(){
+    fun clearContent() = CoroutineScope(Dispatchers.IO).launch{
             realm.executeTransactionAsync {
                 val results = it.where(Content::class.java).lessThanOrEqualTo("insertionTime", System.currentTimeMillis() - C.MAX_TIME_M3U8_URL).findAll()
                 results.deleteAllFromRealm()

@@ -9,11 +9,13 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_video_player.*
 import kotlinx.android.synthetic.main.fragment_video_player.*
 import net.xblacky.animexstream.MainActivity
@@ -22,16 +24,16 @@ import net.xblacky.animexstream.utils.model.Content
 import timber.log.Timber
 import java.lang.Exception
 
+@AndroidEntryPoint
 class VideoPlayerActivity : AppCompatActivity(), VideoPlayerListener {
 
-    private lateinit var viewModel: VideoPlayerViewModel
+    private val viewModel: VideoPlayerViewModel by viewModels()
     private var episodeNumber: String? = ""
     private var animeName: String? = ""
     private lateinit var content: Content
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_player)
-        viewModel = ViewModelProvider(this).get(VideoPlayerViewModel::class.java)
         getExtra(intent)
 //        (playerFragment as VideoPlayerFragment).updateContent(Content(
 //            url = url,

@@ -3,8 +3,12 @@ package net.xblacky.animexstream.ui.main.animeinfo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import net.xblacky.animexstream.ui.main.home.HomeRepository
 import net.xblacky.animexstream.utils.CommonViewModel
 import net.xblacky.animexstream.utils.constants.C
 import net.xblacky.animexstream.utils.model.AnimeInfoModel
@@ -14,76 +18,54 @@ import net.xblacky.animexstream.utils.parser.HtmlParser
 import okhttp3.Response
 import okhttp3.ResponseBody
 import timber.log.Timber
+import javax.inject.Inject
 
-class AnimeInfoViewModel(categoryUrl: String) : CommonViewModel() {
+class AnimeInfoViewModel(
+    val categoryUrl: String
+) : CommonViewModel() {
 
-    private var categoryUrl: String? = null
+    @Inject
+    lateinit var animeInfoRepository: AnimeInfoRepository
     private var _animeInfoModel: MutableLiveData<AnimeInfoModel> = MutableLiveData()
     private var _episodeList: MutableLiveData<ArrayList<EpisodeModel>> = MutableLiveData()
     var episodeList: LiveData<ArrayList<EpisodeModel>> = _episodeList
     var animeInfoModel: LiveData<AnimeInfoModel> = _animeInfoModel
-    private val animeInfoRepository = AnimeInfoRepository()
-    private var compositeDisposable = CompositeDisposable()
     private var _isFavourite: MutableLiveData<Boolean> = MutableLiveData(false)
     var isFavourite: LiveData<Boolean> = _isFavourite
 
     init {
-        this.categoryUrl = categoryUrl
         fetchAnimeInfo()
     }
 
-    fun fetchAnimeInfo() {
+    fun fetchAnimeInfo() = viewModelScope.launch {
         updateLoading(loading = true)
         updateErrorModel(false, null, false)
         categoryUrl?.let {
-            compositeDisposable.add(
-                animeInfoRepository.fetchAnimeInfo(it)
-                    .subscribeWith(getAnimeInfoObserver(C.TYPE_ANIME_INFO))
+            val resp = animeInfoRepository.fetchAnimeInfo(it)
+            getAnimeInfoObserver(resp, C.TYPE_ANIME_INFO)
+        }
+    }
+
+    private fun getAnimeInfoObserver(response: ResponseBody, typeValue: Int) : Job = viewModelScope.launch{
+        if (typeValue == C.TYPE_ANIME_INFO) {
+            val animeInfoModel = HtmlParser.parseAnimeInfo(response = response.string())
+            _animeInfoModel.value = animeInfoModel
+            val res = animeInfoRepository.fetchEpisodeList(
+                id = animeInfoModel.id,
+                endEpisode = animeInfoModel.endEpisode,
+                alias = animeInfoModel.alias
             )
+            getAnimeInfoObserver(
+                response = res,
+                typeValue = C.TYPE_EPISODE_LIST
+            )
+            _isFavourite.value = animeInfoRepository.isFavourite(animeInfoModel.id)
+
+        } else if (typeValue == C.TYPE_EPISODE_LIST) {
+            _episodeList.value = HtmlParser.fetchEpisodeList(response = response.string())
+            updateLoading(loading = false)
         }
     }
-
-    private fun getAnimeInfoObserver(typeValue: Int): DisposableObserver<ResponseBody> {
-        return object : DisposableObserver<ResponseBody>() {
-            override fun onNext(response: ResponseBody) {
-                if (typeValue == C.TYPE_ANIME_INFO) {
-                    val animeInfoModel = HtmlParser.parseAnimeInfo(response = response.string())
-                    _animeInfoModel.value = animeInfoModel
-                    compositeDisposable.add(
-                        animeInfoRepository.fetchEpisodeList(
-                            id = animeInfoModel.id,
-                            endEpisode = animeInfoModel.endEpisode,
-                            alias = animeInfoModel.alias
-                        )
-                            .subscribeWith(getAnimeInfoObserver(C.TYPE_EPISODE_LIST))
-                    )
-                    _isFavourite.value = animeInfoRepository.isFavourite(animeInfoModel.id)
-
-
-                } else if (typeValue == C.TYPE_EPISODE_LIST) {
-                    _episodeList.value = HtmlParser.fetchEpisodeList(response = response.string())
-                    updateLoading(loading = false)
-
-                }
-            }
-
-            override fun onComplete() {
-
-            }
-
-            override fun onError(e: Throwable) {
-                updateLoading(loading = false)
-                if (typeValue == C.TYPE_ANIME_INFO) {
-                    updateErrorModel(show = true, e = e, isListEmpty = false)
-                } else {
-                    updateErrorModel(show = true, e = e, isListEmpty = true)
-                }
-
-            }
-
-        }
-    }
-
 
     fun toggleFavourite() {
         if (_isFavourite.value!!) {
@@ -91,7 +73,6 @@ class AnimeInfoViewModel(categoryUrl: String) : CommonViewModel() {
             _isFavourite.value = false
         } else {
             saveFavourite()
-
         }
     }
 
@@ -114,9 +95,6 @@ class AnimeInfoViewModel(categoryUrl: String) : CommonViewModel() {
 //    }
 
     override fun onCleared() {
-        if (!compositeDisposable.isDisposed) {
-            compositeDisposable.dispose()
-        }
         if (isFavourite.value!!) {
             saveFavourite()
         }

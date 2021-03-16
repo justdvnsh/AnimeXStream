@@ -1,21 +1,26 @@
 package net.xblacky.animexstream.ui.main.player
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.xblacky.animexstream.utils.CommonViewModel
 import net.xblacky.animexstream.utils.constants.C
 import net.xblacky.animexstream.utils.model.Content
 import net.xblacky.animexstream.utils.parser.HtmlParser
 import okhttp3.ResponseBody
 import retrofit2.HttpException
+import javax.inject.Inject
 
-class VideoPlayerViewModel : CommonViewModel() {
+class VideoPlayerViewModel @ViewModelInject constructor(
+    val episodeRepository: EpisodeRepository
+) : CommonViewModel() {
 
-    private val episodeRepository = EpisodeRepository()
-    private var compositeDisposable = CompositeDisposable()
     private var _content = MutableLiveData<Content>(Content())
     var liveContent: LiveData<Content> = _content
 
@@ -23,7 +28,7 @@ class VideoPlayerViewModel : CommonViewModel() {
         episodeRepository.clearContent()
     }
 
-    fun fetchEpisodeMediaUrl(fetchFromDb: Boolean = true) {
+    fun fetchEpisodeMediaUrl(fetchFromDb: Boolean = true) = viewModelScope.launch{
         liveContent.value?.episodeUrl?.let {
             updateErrorModel(show = false, e = null, isListEmpty = false)
             updateLoading(loading = true)
@@ -43,57 +48,34 @@ class VideoPlayerViewModel : CommonViewModel() {
         }
     }
 
-    private fun fetchFromInternet(url: String) {
-        compositeDisposable.add(
-            episodeRepository.fetchEpisodeMediaUrl(url = url).subscribeWith(
-                getEpisodeUrlObserver(
-                    C.TYPE_MEDIA_URL
-                )
-            )
-        )
+    private fun fetchFromInternet(url: String) = viewModelScope.launch{
+        val resp = episodeRepository.fetchEpisodeMediaUrl(url=url)
+        getEpisodeUrlObserver(resp, C.TYPE_MEDIA_URL)
     }
 
     fun updateEpisodeContent(content: Content) {
         _content.value = content
     }
 
-    private fun getEpisodeUrlObserver(type: Int): DisposableObserver<ResponseBody> {
-        return object : DisposableObserver<ResponseBody>() {
-            override fun onComplete() {
-                updateErrorModel(show = false, e = null, isListEmpty = false)
+    private fun getEpisodeUrlObserver(response: ResponseBody, type: Int): Job = viewModelScope.launch {
+        if (type == C.TYPE_MEDIA_URL) {
+            val episodeInfo = HtmlParser.parseMediaUrl(response = response.string())
+            episodeInfo.vidcdnUrl?.let {
+                val res = episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!)
+                getEpisodeUrlObserver(res, C.TYPE_M3U8_URL)
             }
-
-            override fun onNext(response: ResponseBody) {
-                if (type == C.TYPE_MEDIA_URL) {
-                    val episodeInfo = HtmlParser.parseMediaUrl(response = response.string())
-                    episodeInfo.vidcdnUrl?.let {
-                        compositeDisposable.add(
-                            episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!).subscribeWith(
-                                getEpisodeUrlObserver(C.TYPE_M3U8_URL)
-                            )
-                        )
-                    }
-                    val watchedEpisode =
-                        episodeRepository.fetchWatchedDuration(_content.value?.episodeUrl.hashCode())
-                    _content.value?.watchedDuration = watchedEpisode?.watchedDuration ?: 0
-                    _content.value?.previousEpisodeUrl = episodeInfo.previousEpisodeUrl
-                    _content.value?.nextEpisodeUrl = episodeInfo.nextEpisodeUrl
-                } else if (type == C.TYPE_M3U8_URL) {
-                    val m3u8Url = HtmlParser.parseM3U8Url(response = response.string())
-                    val content = _content.value
-                    content?.url = m3u8Url
-                    _content.value = content
-                    saveContent(content!!)
-                    updateLoading(false)
-                }
-
-            }
-
-            override fun onError(e: Throwable) {
-                updateLoading(false)
-                updateErrorModel(true, e, false)
-            }
-
+            val watchedEpisode =
+                episodeRepository.fetchWatchedDuration(_content.value?.episodeUrl.hashCode())
+            _content.value?.watchedDuration = watchedEpisode?.watchedDuration ?: 0
+            _content.value?.previousEpisodeUrl = episodeInfo.previousEpisodeUrl
+            _content.value?.nextEpisodeUrl = episodeInfo.nextEpisodeUrl
+        } else if (type == C.TYPE_M3U8_URL) {
+            val m3u8Url = HtmlParser.parseM3U8Url(response = response.string())
+            val content = _content.value
+            content?.url = m3u8Url
+            _content.value = content
+            saveContent(content!!)
+            updateLoading(false)
         }
     }
 
@@ -101,13 +83,5 @@ class VideoPlayerViewModel : CommonViewModel() {
         if (!content.url.isNullOrEmpty()) {
             episodeRepository.saveContent(content)
         }
-    }
-
-
-    override fun onCleared() {
-        if (!compositeDisposable.isDisposed) {
-            compositeDisposable.dispose()
-        }
-        super.onCleared()
     }
 }
