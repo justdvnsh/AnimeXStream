@@ -20,7 +20,7 @@ public class RetrofitHelper {
         }
     }
 
-    public static Retrofit createRetrofitInstance() {
+    public RetrofitHelper(){
         OkHttpClient client;
 
         if(BuildConfig.DEBUG){
@@ -41,8 +41,8 @@ public class RetrofitHelper {
                 .client(client)
                 .baseUrl(C.Companion.getBASE_URL())
                 .build();
+        retrofitInstance = retrofit;
 
-        return retrofit;
     }
 
 

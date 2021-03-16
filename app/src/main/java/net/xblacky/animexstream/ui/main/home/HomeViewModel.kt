@@ -173,7 +173,7 @@ class HomeViewModel @ViewModelInject constructor(
         }
         val response = homeRepository.fetchRecentSubOrDub(1, C.RECENT_SUB)
         getHomeListObserver(response, C.TYPE_RECENT_SUB)
-        addRealmListener(C.TYPE_RECENT_SUB)
+//        addRealmListener(C.TYPE_RECENT_SUB)
     }
 
     private fun fetchRecentDub() = viewModelScope.launch{
@@ -183,7 +183,7 @@ class HomeViewModel @ViewModelInject constructor(
         }
         val response = (homeRepository.fetchRecentSubOrDub(1, C.RECENT_DUB))
         getHomeListObserver(response, C.TYPE_RECENT_DUB)
-        addRealmListener(C.TYPE_RECENT_DUB)
+//        addRealmListener(C.TYPE_RECENT_DUB)
     }
 
     private fun fetchMovies() = viewModelScope.launch{
@@ -193,7 +193,7 @@ class HomeViewModel @ViewModelInject constructor(
         }
         val response = homeRepository.fetchMovies(1)
         getHomeListObserver(response, C.TYPE_MOVIE)
-        addRealmListener(C.TYPE_MOVIE)
+//        addRealmListener(C.TYPE_MOVIE)
     }
 
     private fun fetchPopular() = viewModelScope.launch{
@@ -203,7 +203,7 @@ class HomeViewModel @ViewModelInject constructor(
         }
         val response = homeRepository.fetchPopularFromAjax(1)
         getHomeListObserver(response, C.TYPE_POPULAR_ANIME)
-        addRealmListener(C.TYPE_POPULAR_ANIME)
+//        addRealmListener(C.TYPE_POPULAR_ANIME)
     }
 
     private fun fetchNewSeason() = viewModelScope.launch{
@@ -213,7 +213,7 @@ class HomeViewModel @ViewModelInject constructor(
         }
         val response = homeRepository.fetchNewestAnime(1)
         getHomeListObserver(response, C.TYPE_NEW_SEASON)
-        addRealmListener(C.TYPE_NEW_SEASON)
+//        addRealmListener(C.TYPE_NEW_SEASON)
     }
 
     override fun onCleared() {

@@ -14,6 +14,7 @@ import net.xblacky.animexstream.utils.realm.InitalizeRealm
 import net.xblacky.animexstream.utils.rertofit.NetworkInterface
 import net.xblacky.animexstream.utils.rertofit.RetrofitHelper
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import javax.inject.Singleton
 
@@ -23,7 +24,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(): Retrofit = Retrofit.Builder().baseUrl(BASE_URL).build()
+    fun provideRetrofit(): Retrofit = Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(
+        GsonConverterFactory.create()).build()
 
     @Provides
     @Singleton
