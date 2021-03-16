@@ -1,5 +1,6 @@
 package net.xblacky.animexstream.utils.parser
 
+import android.util.Log
 import io.realm.RealmList
 import net.xblacky.animexstream.utils.constants.C
 import net.xblacky.animexstream.utils.model.*
@@ -157,10 +158,26 @@ class HtmlParser {
         }
 
         fun parseMediaUrl(response: String): EpisodeInfo{
-            var mediaUrl: String?
+            var mediaUrl: String? = null
             val document = Jsoup.parse(response)
-            val info = document?.getElementsByClass("vidcdn")?.first()?.select("a")
-            mediaUrl = info?.attr("data-video").toString()
+            Log.d("MYSELF FROM PARSER", document.toString())
+            val info = document?.getElementsByClass("favorites_book")?.first()?.child(0)?.children()
+            Log.d("MYSELF -> info ", info.toString())
+            if (info != null) {
+                for (link in info) {
+                    if (link.hasClass("dowloads")) {
+                        Log.d("MYSELF", link.toString())
+                        val cls = link.getElementsByClass("dowloads")?.first()?.select("a")
+                        Log.d("MYSELF -> CLS ", cls.toString())
+                        cls?.let {
+                            mediaUrl = it.attr("href").toString()
+                        } ?: kotlin.run {
+                            // do somethinf
+                        }
+                    }
+                }
+            }
+            Log.d("MYSELF -> URL ", mediaUrl)
             val nextEpisodeUrl = document.getElementsByClass("anime_video_body_episodes_r")?.select("a")?.first()?.attr("href")
             val previousEpisodeUrl = document.getElementsByClass("anime_video_body_episodes_l")?.select("a")?.first()?.attr("href")
 
@@ -169,6 +186,15 @@ class HtmlParser {
                 previousEpisodeUrl = previousEpisodeUrl,
                 vidcdnUrl = mediaUrl
             )
+        }
+
+        fun parseStreamingUrl(url: String): String {
+            Log.d("MYSELF -> STREAMING - ", Jsoup.parse(url).toString())
+            val doc = Jsoup.parse(url)
+            val streamingLinks = doc.getElementsByClass("dowload")?.first()?.select("a")
+            val link = streamingLinks?.attr("href").toString()
+            Log.d("MYSELF -> STREAMING - ", link)
+            return link
         }
 
         fun parseM3U8Url(response: String): String?{

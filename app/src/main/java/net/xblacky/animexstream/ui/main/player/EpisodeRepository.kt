@@ -22,11 +22,14 @@ import javax.inject.Inject
 class EpisodeRepository @Inject constructor(
     val realm: Realm,
     val fetchEpisodeMediaUrl: NetworkInterface.FetchEpisodeMediaUrl,
+    val fetchStreamingUrl: NetworkInterface.FetchStreamingUrl,
     val fetchEpisodemM3u8Url: NetworkInterface.FetchM3u8Url
 ){
 
 
     suspend fun fetchEpisodeMediaUrl(url: String): ResponseBody = fetchEpisodeMediaUrl.get(url)
+
+    suspend fun fetchEpisodeStreamingUrl(url: String): ResponseBody = fetchStreamingUrl.get(url)
 
     suspend fun fetchM3u8Url(url: String): ResponseBody = fetchEpisodemM3u8Url.get(url)
 

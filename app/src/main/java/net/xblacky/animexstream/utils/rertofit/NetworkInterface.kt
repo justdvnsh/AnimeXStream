@@ -72,6 +72,18 @@ class NetworkInterface {
 
     }
 
+    interface FetchStreamingUrl {
+        @Headers(
+            C.USER_AGENT,
+            C.REFERER
+        )
+        @GET
+        suspend fun get(
+            @Url url: String
+        ): ResponseBody
+
+    }
+
     interface FetchAnimeInfo {
         @Headers(
             C.USER_AGENT,

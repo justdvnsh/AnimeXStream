@@ -24,10 +24,13 @@ import net.xblacky.animexstream.utils.ItemOffsetDecoration
 import net.xblacky.animexstream.utils.Tags.GenreTags
 import net.xblacky.animexstream.utils.Utils
 import net.xblacky.animexstream.utils.model.AnimeInfoModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AnimeInfoFragment : Fragment() {
 
+    @Inject
+    lateinit var animeInfoRepository: AnimeInfoRepository
     private lateinit var rootView: View
     private lateinit var viewModelFactory: AnimeInfoViewModelFactory
     private lateinit var viewModel: AnimeInfoViewModel
@@ -40,7 +43,7 @@ class AnimeInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         rootView = inflater.inflate(R.layout.fragment_animeinfo, container, false)
-        viewModelFactory = AnimeInfoViewModelFactory(AnimeInfoFragmentArgs.fromBundle(requireArguments()).categoryUrl!!)
+        viewModelFactory = AnimeInfoViewModelFactory(AnimeInfoFragmentArgs.fromBundle(requireArguments()).categoryUrl!!, animeInfoRepository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(AnimeInfoViewModel::class.java)
         setupRecyclerView()
         setObserver()

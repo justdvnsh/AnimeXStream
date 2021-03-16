@@ -8,6 +8,7 @@ import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import net.xblacky.animexstream.ui.main.animeinfo.AnimeInfoRepository
 import net.xblacky.animexstream.ui.main.home.HomeRepository
 import net.xblacky.animexstream.utils.constants.C.Companion.BASE_URL
 import net.xblacky.animexstream.utils.realm.InitalizeRealm
@@ -62,6 +63,11 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesFetchStreamingUrl(retrofit: Retrofit) =
+        retrofit.create(NetworkInterface.FetchStreamingUrl::class.java)
+
+    @Provides
+    @Singleton
     fun providesFetchAnimeInfo(retrofit: Retrofit) =
         retrofit.create(NetworkInterface.FetchAnimeInfo::class.java)
 
@@ -79,6 +85,18 @@ object AppModule {
     @Singleton
     fun providesFetchSearchData(retrofit: Retrofit) =
         retrofit.create(NetworkInterface.FetchSearchData::class.java)
+
+    @Provides
+    @Singleton
+    fun providesAnimeInfoRepository(
+        realm: Realm,
+        fetchAnimeInfo: NetworkInterface.FetchAnimeInfo,
+        fetchEpisodeList: NetworkInterface.FetchEpisodeList
+    ) = AnimeInfoRepository(
+        realm,
+        fetchAnimeInfo,
+        fetchEpisodeList
+    )
 
 //    // repos
 //    @Provides

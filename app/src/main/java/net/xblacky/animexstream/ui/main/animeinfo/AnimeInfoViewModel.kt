@@ -21,11 +21,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class AnimeInfoViewModel(
-    val categoryUrl: String
+    val categoryUrl: String,
+    val animeInfoRepository: AnimeInfoRepository
 ) : CommonViewModel() {
 
-    @Inject
-    lateinit var animeInfoRepository: AnimeInfoRepository
     private var _animeInfoModel: MutableLiveData<AnimeInfoModel> = MutableLiveData()
     private var _episodeList: MutableLiveData<ArrayList<EpisodeModel>> = MutableLiveData()
     var episodeList: LiveData<ArrayList<EpisodeModel>> = _episodeList

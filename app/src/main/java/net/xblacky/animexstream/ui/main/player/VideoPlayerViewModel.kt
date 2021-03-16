@@ -1,5 +1,6 @@
 package net.xblacky.animexstream.ui.main.player
 
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -60,10 +61,17 @@ class VideoPlayerViewModel @ViewModelInject constructor(
     private fun getEpisodeUrlObserver(response: ResponseBody, type: Int): Job = viewModelScope.launch {
         if (type == C.TYPE_MEDIA_URL) {
             val episodeInfo = HtmlParser.parseMediaUrl(response = response.string())
-            episodeInfo.vidcdnUrl?.let {
-                val res = episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!)
-                getEpisodeUrlObserver(res, C.TYPE_M3U8_URL)
-            }
+            Log.d("MYSELF - EPISODEINFO", episodeInfo.vidcdnUrl.toString()!!)
+//            episodeInfo.vidcdnUrl?.let {
+//
+//            }
+            val response = episodeRepository.fetchEpisodeStreamingUrl(episodeInfo.vidcdnUrl!!)
+            Log.d("MYSELF-EPISODEINFORESP", response.string())
+            getEpisodeUrlObserver(response, C.TYPE_STREAMING_URL)
+//            episodeInfo.vidcdnUrl?.let {
+//                val res = episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!)
+//                getEpisodeUrlObserver(res, C.TYPE_M3U8_URL)
+//            }
             val watchedEpisode =
                 episodeRepository.fetchWatchedDuration(_content.value?.episodeUrl.hashCode())
             _content.value?.watchedDuration = watchedEpisode?.watchedDuration ?: 0
@@ -73,6 +81,13 @@ class VideoPlayerViewModel @ViewModelInject constructor(
             val m3u8Url = HtmlParser.parseM3U8Url(response = response.string())
             val content = _content.value
             content?.url = m3u8Url
+            _content.value = content
+            saveContent(content!!)
+            updateLoading(false)
+        } else if (type == C.TYPE_STREAMING_URL) {
+            val url = HtmlParser.parseStreamingUrl(response.string())
+            val content = _content.value
+            content?.url = url
             _content.value = content
             saveContent(content!!)
             updateLoading(false)
