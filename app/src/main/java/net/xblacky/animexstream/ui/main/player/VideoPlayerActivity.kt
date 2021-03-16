@@ -190,16 +190,16 @@ class VideoPlayerActivity : AppCompatActivity(), VideoPlayerListener {
                 }
             }
         })
-        viewModel.isLoading.observe(this, Observer {
-            (playerFragment as VideoPlayerFragment).showLoading(it.isLoading)
-        })
-        viewModel.errorModel.observe(this, Observer {
-            (playerFragment as VideoPlayerFragment).showErrorLayout(
-                it.show,
-                it.errorMsgId,
-                it.errorCode
-            )
-        })
+//        viewModel.isLoading.observe(this, Observer {
+//            (playerFragment as VideoPlayerFragment).showLoading(it.isLoading)
+//        })
+//        viewModel.errorModel.observe(this, Observer {
+//            (playerFragment as VideoPlayerFragment).showErrorLayout(
+//                it.show,
+//                it.errorMsgId,
+//                it.errorCode
+//            )
+//        })
     }
 
     override fun onBackPressed() {

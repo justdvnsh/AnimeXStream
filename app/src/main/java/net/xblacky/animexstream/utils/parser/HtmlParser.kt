@@ -189,10 +189,14 @@ class HtmlParser {
         }
 
         fun parseStreamingUrl(url: String): String {
-            Log.d("MYSELF -> STREAMING - ", Jsoup.parse(url).toString())
+            Log.d("MYSEFL->STREAMINGACTR- ", url)
+            Log.d("MYSELF STREAMINGJSOUP ", Jsoup.parse(url).toString())
             val doc = Jsoup.parse(url)
+            val links = doc.getElementsByClass("mirror_link")
             val streamingLinks = doc.getElementsByClass("dowload")?.first()?.select("a")
             val link = streamingLinks?.attr("href").toString()
+            Log.d("MYSELF - STREAMING - ", streamingLinks.toString())
+            Log.d("MYSELF-STREAMINGLINK- ", links.toString())
             Log.d("MYSELF -> STREAMING - ", link)
             return link
         }

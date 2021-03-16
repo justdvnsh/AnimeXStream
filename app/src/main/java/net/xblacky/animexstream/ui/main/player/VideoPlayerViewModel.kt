@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import net.xblacky.animexstream.utils.CommonViewModel
 import net.xblacky.animexstream.utils.constants.C
@@ -20,7 +22,7 @@ import javax.inject.Inject
 
 class VideoPlayerViewModel @ViewModelInject constructor(
     val episodeRepository: EpisodeRepository
-) : CommonViewModel() {
+) : ViewModel() {
 
     private var _content = MutableLiveData<Content>(Content())
     var liveContent: LiveData<Content> = _content
@@ -29,17 +31,17 @@ class VideoPlayerViewModel @ViewModelInject constructor(
         episodeRepository.clearContent()
     }
 
-    fun fetchEpisodeMediaUrl(fetchFromDb: Boolean = true) = viewModelScope.launch{
+    fun fetchEpisodeMediaUrl(fetchFromDb: Boolean = true) {
         liveContent.value?.episodeUrl?.let {
-            updateErrorModel(show = false, e = null, isListEmpty = false)
-            updateLoading(loading = true)
+//            updateErrorModel(show = false, e = null, isListEmpty = false)
+//            updateLoading(loading = true)
             val result = episodeRepository.fetchContent(it)
             val animeName = _content.value?.animeName
             if (fetchFromDb) {
                 result?.let {
                     result.animeName = animeName ?: ""
                     _content.value = result
-                    updateLoading(false)
+//                    updateLoading(false)
                 } ?: kotlin.run {
                     fetchFromInternet(it)
                 }
@@ -58,16 +60,18 @@ class VideoPlayerViewModel @ViewModelInject constructor(
         _content.value = content
     }
 
-    private fun getEpisodeUrlObserver(response: ResponseBody, type: Int): Job = viewModelScope.launch {
+    private fun getEpisodeUrlObserver(response: ResponseBody, type: Int): Job = viewModelScope.launch{
         if (type == C.TYPE_MEDIA_URL) {
             val episodeInfo = HtmlParser.parseMediaUrl(response = response.string())
             Log.d("MYSELF - EPISODEINFO", episodeInfo.vidcdnUrl.toString()!!)
-//            episodeInfo.vidcdnUrl?.let {
-//
-//            }
             val response = episodeRepository.fetchEpisodeStreamingUrl(episodeInfo.vidcdnUrl!!)
-            Log.d("MYSELF-EPISODEINFORESP", response.string())
-            getEpisodeUrlObserver(response, C.TYPE_STREAMING_URL)
+//            Log.d("MYSELF-EPISODEINFORESP", response.string())
+            val url = HtmlParser.parseStreamingUrl(response.string())
+            val content = _content.value
+            content?.url = url
+            _content.value = content
+            saveContent(content!!)
+
 //            episodeInfo.vidcdnUrl?.let {
 //                val res = episodeRepository.fetchM3u8Url(episodeInfo.vidcdnUrl!!)
 //                getEpisodeUrlObserver(res, C.TYPE_M3U8_URL)
@@ -83,14 +87,11 @@ class VideoPlayerViewModel @ViewModelInject constructor(
             content?.url = m3u8Url
             _content.value = content
             saveContent(content!!)
-            updateLoading(false)
+//            updateLoading(false)
         } else if (type == C.TYPE_STREAMING_URL) {
-            val url = HtmlParser.parseStreamingUrl(response.string())
-            val content = _content.value
-            content?.url = url
-            _content.value = content
-            saveContent(content!!)
-            updateLoading(false)
+            Log.d("MYSELF-STREEEINFORESP", response.string())
+
+//            updateLoading(false)
         }
     }
 
